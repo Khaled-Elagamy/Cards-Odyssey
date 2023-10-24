@@ -1,4 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001", { autoConnect: false });
+const socketUrl = new URL("/", window.location.href);
+socketUrl.port = "3001";
+const socket = io(socketUrl.toString(), { autoConnect: false });
 export default socket;
