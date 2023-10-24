@@ -20,12 +20,14 @@ app.set("port", port);
 //   mainhandler(io, socket);
 // };
 // io.on("connection", onConnection);
-io.use((socket, next) => {
+io.use((socket: CustomSocket, next) => {
   const username = socket.handshake.auth.username;
   if (!username) {
     return next(new Error("invalid username"));
   }
-  socket.data.username = username;
+  socket.userData = {
+    name: username,
+  };
   next();
 });
 
@@ -42,16 +44,13 @@ function updateAvailableRooms() {
 }
 
 io.on("connection", (socket: CustomSocket) => {
-  socket.userData = {
-    name: "",
-  };
   console.log(`User Connected: ${socket.id}`);
   const existingUser = users.find((user) => user.userID === socket.id);
   if (!existingUser) {
     // When a user connects, add them to the users array
     users.push({
       userID: socket.id,
-      username: socket.data.username,
+      username: socket.userData?.name || " ",
     });
     connectedSockets.set(socket.id, socket);
     //console.log(connectedSockets);
@@ -64,12 +63,16 @@ io.on("connection", (socket: CustomSocket) => {
     updateAvailableRooms();
   });
 
-  socket.on("send_message", (data) => {
-    io.to(data.room).emit("receive_message", data);
-  });
-  // socket.on("send-message", (message, time) => {
-  //   socket.emit("recieved-message", socket.userData?.name, message, time);
+  // socket.on("send_message", (data) => {
+  //   io.to(data.room).emit("receive_message", data);
   // });
+  socket.on("send-message", (data) => {
+    io.to(data.room).emit("receive_message", {
+      name: socket.userData?.name,
+      message: data.message,
+      time: data.time,
+    });
+  });
   socket.onAny((event, ...args) => {
     console.log(event, args);
   });

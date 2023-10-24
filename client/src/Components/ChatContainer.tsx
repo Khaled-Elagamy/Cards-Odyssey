@@ -1,13 +1,15 @@
-import ChatInput from './ChatInput';
-import MessageList from './MessageList';
-
-function ChatContainer() {
+import ChatInput from "./ChatInput";
+import MessageList from "./MessageList";
+type ChatProps = {
+  room: string;
+};
+const ChatContainer = (props: ChatProps) => {
   return (
     <div>
-      <ChatInput />
+      <ChatInput room={props.room} />
       <MessageList />
     </div>
   );
-}
+};
 
 export default ChatContainer;

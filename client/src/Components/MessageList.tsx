@@ -1,30 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import socket from "../socket"; // Import your chat socket setup
 
-function MessageList() {
+const MessageList = () => {
   const [chatMessages, setChatMessages] = useState<string[]>([]);
-
   useEffect(() => {
-    socket.on("received-message", (name, message, time) => {
-      console.log(message);
-      const newMessage = `[${time}] ${name}: ${message}`;
-      setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+    socket.on("receive_message", (data) => {
+      const newMessage = `[${data.time}] ${data.name}: ${data.message}`;
+      setChatMessages((chatMessages) => [...chatMessages, newMessage]);
     });
     return () => {
-      // Remove all the event listeners we set up to avoid memory leaks and unintended behaviors.
-      socket.off("received-message");
+      socket.off("receive_message");
     };
-  }, []);
+  }, [socket]);
 
   return (
     <div>
       <h1>Messgaes:</h1>
-      {chatMessages}
-      {chatMessages.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
+      <div className="chat-container">
+        {chatMessages.map((message, index) => (
+          <div key={index}>{message}</div>
+        ))}
+      </div>
     </div>
   );
-}
+};
 
 export default MessageList;

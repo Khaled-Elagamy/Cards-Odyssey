@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import "./App.css";
+import "./styles/global.css";
 import UsernameInput from "./Components/UsernameInput";
 import UserList, { User } from "./Components/UsersList";
 import socket from "./socket";
 import { Socket } from "socket.io-client";
+import ChatContainer from "./Components/ChatContainer";
+import ChatBox from "./Components/ChatBox";
 
 function App() {
   //UserName
@@ -65,46 +67,40 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        {usernameAlreadySelected ? (
-          <div>
-            <p>Welcome, {username}!</p>
-            <UserList users={users} />
-            <h2>Available Rooms:</h2>
-            {loadingRooms ? (
-              <p>Loading...</p>
-            ) : (
-              <ul>
-                {availableRooms.map((room, index) => (
-                  <li key={index}>{room}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ) : (
-          <UsernameInput onUsernameSelection={onUsernameSelection} />
-        )}
-        {errorMessage && <p>{errorMessage}</p>}
-
-        <input
-          placeholder="Room Number..."
-          onChange={(event) => {
-            setRoom(event.target.value);
-          }}
-        />
-        <button onClick={joinRoom}> Join Room</button>
-        <input
+      {usernameAlreadySelected ? (
+        <div>
+          <p>Welcome, {username}!</p>
+          <UserList users={users} />
+          <h2>Available Rooms:</h2>
+          {loadingRooms ? (
+            <p>Loading...</p>
+          ) : (
+            <ul>
+              {availableRooms.map((room, index) => (
+                <li key={index}>{room}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : (
+        <UsernameInput onUsernameSelection={onUsernameSelection} />
+      )}
+      {errorMessage && <p>{errorMessage}</p>}
+      <input
+        placeholder="Room Number..."
+        onChange={(event) => {
+          setRoom(event.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            joinRoom();
+            // Call your function here
+          }
+        }}
+      />
+      <button onClick={joinRoom}> Join Room</button>
+      {/* <input
           placeholder="Message..."
           value={messageInput}
           onChange={(event) => {
@@ -117,8 +113,8 @@ function App() {
           {chatMessages.map((message, index) => (
             <div key={index}>{message}</div>
           ))}
-        </div>
-      </header>
+        </div> */}
+      {room == "" ? "" : <ChatBox room={room} username={username} />}
     </div>
   );
 }
